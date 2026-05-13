@@ -19,6 +19,18 @@ namespace frmBeepPlayer
         private Rectangle[] originalBtnRects;
         private Button[] buttons;
 
+        // 彩虹低飽和顏色陣列 (Pastel colors)
+        private Color[] rainbowColors = new Color[] {
+            Color.FromArgb(255, 179, 186), // Do: 淺紅
+            Color.FromArgb(255, 223, 186), // Re: 淺橙
+            Color.FromArgb(255, 255, 186), // Mi: 淺黃
+            Color.FromArgb(186, 255, 201), // Fa: 淺綠
+            Color.FromArgb(186, 225, 255), // So: 淺藍
+            Color.FromArgb(208, 186, 255), // La: 淺紫
+            Color.FromArgb(255, 186, 240), // Si: 淺粉
+            Color.FromArgb(186, 255, 255)  // 高音Do: 淺青
+        };
+
         public Form1()
         {
             InitializeComponent();
@@ -40,6 +52,11 @@ namespace frmBeepPlayer
                 buttons[i].Size = new Size(keyWidth, keyHeight);
                 buttons[i].Location = new Point(startX + i * (keyWidth + padding), startY);
                 buttons[i].TabStop = false; // 取消焦點，避免出現藍色框框
+
+                // 套用美化的低飽和度顏色及扁平化樣式
+                buttons[i].BackColor = rainbowColors[i];
+                buttons[i].FlatStyle = FlatStyle.Flat;
+                buttons[i].FlatAppearance.BorderSize = 0;
             }
 
             btnAutoPlay.TabStop = false; // 取消自動播放按鈕的焦點
@@ -87,9 +104,6 @@ namespace frmBeepPlayer
             int[] melody = { 4, 2, 2, -1, 3, 1, 1, -1, 0, 1, 2, 3, 4, 4, 4, -1 };
             int duration = 300; 
 
-            Color originalColor = SystemColors.Control;
-            if (buttons.Length > 0) originalColor = Color.White;
-
             await Task.Run(() =>
             {
                 foreach (int note in melody)
@@ -101,12 +115,12 @@ namespace frmBeepPlayer
                     else
                     {
                         // 透過 Invoke 在主執行緒更新 UI 呈現按下的效果
-                        this.Invoke(new Action(() => buttons[note].BackColor = Color.LightSkyBlue));
+                        this.Invoke(new Action(() => buttons[note].BackColor = Color.LightGray));
 
                         Beep(freq[note], duration);
 
-                        // 恢復原本的按鈕顏色
-                        this.Invoke(new Action(() => buttons[note].BackColor = originalColor));
+                        // 恢復原本的專屬彩虹顏色
+                        this.Invoke(new Action(() => buttons[note].BackColor = rainbowColors[note]));
 
                         System.Threading.Thread.Sleep(50); // 音符間隔
                     }
